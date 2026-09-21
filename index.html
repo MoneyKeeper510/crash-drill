@@ -84,7 +84,7 @@
   <div class="fxbox">
     <div>USDJPY <b id="fx">—</b></div>
     <div>金 <b id="goldusd">—</b> $/oz</div>
-    <div>金円換算 <b id="goldjpy">—</b></div>
+    <div>金 税込目安 <b id="goldjpy">—</b></div>
     <div>S&amp;P500 <b id="spx">—</b></div>
   </div>
   <div class="chart-wrap"><canvas id="cv"></canvas></div>
@@ -115,6 +115,7 @@
   <p class="note">
     スライダーで大まかに、右の数字欄で1万円単位まで合わせる。総額と％は合計から自動計算。
     既存分はホールド、積立だけ毎月の目標％で購入。
+    金の税込目安は LBMAドル/oz × 為替 ÷ 31.1g × 消費税10%。店頭スプレッドは含まない。
     週次は公開情報の月次・局面水準を補間した教育用系列。配当・税金・手数料は含まない。
     FANG+合成は当時存在した成長株の粗い等ウェイト近似（公式NYSE FANG+ではない）。
   </p>
@@ -194,6 +195,9 @@ function yenPrice(row,id){
   if(id==='gold') return row.gold*row.usdjpy;
   if(USD.has(id)) return row[id]*row.usdjpy;
   return row[id];
+}
+function goldPerGramTaxed(row){
+  return row.gold*row.usdjpy/31.1*1.10;
 }
 function totalYen(){
   return ASSETS.reduce((s,a)=>s+holdMan[a.id]*10000,0);
@@ -308,7 +312,7 @@ function draw(sim,idx){
   ctx.beginPath(); ctx.arc(x(idx),y(vals[idx]),narrow?5:4.5,0,6.28);
   ctx.fillStyle='#b85a4a'; ctx.fill();
   ctx.fillStyle='#6f675e';
-  ctx.font=narrow?'12px sans-serif':'12px sans-serif';
+  ctx.font='12px sans-serif';
   ctx.textAlign='center';
   const firstY=new Date(weeks[0].t).getUTCFullYear();
   const lastY=new Date(weeks[weeks.length-1].t).getUTCFullYear();
@@ -355,7 +359,7 @@ function render(){
   el.innerHTML=`${pnl>=0?'+':''}${(pnl/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})}万円<br>${pct>=0?'+':''}${pct.toFixed(2)}%`;
   document.getElementById('fx').textContent=row.usdjpy.toFixed(2);
   document.getElementById('goldusd').textContent=Math.round(row.gold).toLocaleString();
-  document.getElementById('goldjpy').textContent=Math.round(row.gold*row.usdjpy).toLocaleString()+'円/oz';
+  document.getElementById('goldjpy').textContent=Math.round(goldPerGramTaxed(row)).toLocaleString()+'円/g';
   document.getElementById('spx').textContent=Math.round(row.spx).toLocaleString();
   const cmpPnl=(sim.cmp[weekIdx]-paid)/paid*100;
   document.getElementById('bench').textContent=`100% S&P500円建て ${cmpPnl>=0?'+':''}${cmpPnl.toFixed(2)}%`;
