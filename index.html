@@ -18,6 +18,7 @@
   .asset { font-size:40px; font-weight:700; letter-spacing:-.5px; }
   .pnl.neg { color:var(--red); } .pnl.pos { color:var(--green); }
   .meta { color:var(--muted); font-size:13px; }
+  #when { min-height:2.6em; line-height:1.45; }
   .pills { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
   .pill { background:#fff; border:1px solid var(--line); color:var(--ink); padding:7px 12px; border-radius:999px; cursor:pointer; font-size:12px; }
   .pill.on { background:#f3d7a6; border-color:#e2b56a; color:#5a3f12; }
@@ -105,7 +106,7 @@
   <div class="sns">
     <a href="https://www.youtube.com/@Asset_gold" target="_blank" rel="noopener">YouTube「マネーキーパー」</a>
     <a href="https://note.com/moneykeeper/n/neae83f766d3d" target="_blank" rel="noopener">NOTE「金投資虎の巻」</a>
-    <a href="https://x.com/GoldAsset53416" target="_blank" rel="noopener">マネーキーパーのXアカウント</a>
+    <a href="https://x.com/GoldAsset53416" target="_blank" rel="noopener">X</a>
     <a href="https://yoor.jp/door/moneykeeper" target="_blank" rel="noopener">コミュニティ「ゴルラボ」</a>
   </div>
   <p class="note">
@@ -328,8 +329,8 @@ function render(){
       ? (cur.val/100000000).toLocaleString('ja-JP',{maximumFractionDigits:2})+'億円'
       : fmtMan(cur.val);
   const d=new Date(row.t);
-  document.getElementById('when').textContent=
-    `${d.getUTCFullYear()}年${d.getUTCMonth()+1}月${d.getUTCDate()}日  第${weekIdx+1}/${weeks.length}週　${PERIODS[period].note}`;
+  document.getElementById('when').innerHTML=
+    `${d.getUTCFullYear()}年${d.getUTCMonth()+1}月${d.getUTCDate()}日　第${weekIdx+1}/${weeks.length}週<br>${PERIODS[period].note}`;
   const el=document.getElementById('pnl');
   el.className='pnl '+(pnl>=0?'pos':'neg');
   el.innerHTML=`${pnl>=0?'+':''}${(pnl/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})}万円<br>${pct>=0?'+':''}${pct.toFixed(2)}%`;
