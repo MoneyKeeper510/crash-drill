@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>株×金 暴落防災訓練シミュレーター by マネーキーパー</title>
+<title>株×金 暴落・防災訓練シミュレーター by マネーキーパー</title>
 <style>
   :root {
     --bg:#f4efe6; --card:#fffaf3; --line:#e6ddd0; --text:#2c2a26;
@@ -35,25 +35,36 @@
   .fxbox b { color:var(--text); font-weight:600; }
   .hold { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-top:14px; }
   .alloc-head, .alloc-row {
-    display:grid; grid-template-columns:100px 1fr 120px 64px;
+    display:grid; grid-template-columns:100px 1fr 96px 56px;
     gap:10px; align-items:center; font-size:13px;
   }
   .alloc-head { color:var(--muted); font-size:11px; margin-bottom:8px; }
   .alloc-wrap { display:grid; gap:8px; }
-  .yen { text-align:right; color:#8a5a16; font-variant-numeric:tabular-nums; }
   .pct { text-align:right; }
+  .man-in {
+    width:96px; text-align:right; padding:4px 6px;
+    border:1px solid var(--line); border-radius:6px; background:#fff;
+    color:var(--ink); font-variant-numeric:tabular-nums;
+  }
   .sumline { margin-top:12px; font-size:14px; }
+  .sns { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 8px; }
+  .sns a {
+    display:inline-block; background:#fff; border:1px solid var(--line);
+    color:var(--ink); text-decoration:none; border-radius:999px;
+    padding:8px 14px; font-size:13px;
+  }
+  .sns a:hover { background:#f3d7a6; }
   input[type=range] { accent-color:#d98a2b; }
   @media (max-width:720px){
     .asset{font-size:30px;}
-    .alloc-head, .alloc-row { grid-template-columns:76px 1fr 92px 48px; }
+    .alloc-head, .alloc-row { grid-template-columns:76px 1fr 84px 48px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>株×金 暴落・防災訓練シミュレーター by マネーキーパー</h1>
-  <div class="sub">円建て・開始時の保有額を直接指定　／　％と総額は自動計算　／　Created with Grok</div>
+  <div class="sub">円建て・開始時の保有額を直接指定　／　％と総額は自動計算</div>
   <div class="pills" id="periods"></div>
   <div class="top">
     <div>
@@ -86,31 +97,22 @@
   </div>
   <div class="hold">
     <div class="alloc-head">
-      <span>指数</span><span>保有額スライダー（最大2億円）</span><span class="yen">開始時の円金額</span><span class="pct">割合</span>
+      <span>指数</span><span>保有額スライダー（最大2億円）</span><span>万円</span><span class="pct">割合</span>
     </div>
     <div class="alloc-wrap" id="allocs"></div>
     <div class="sumline" id="allocsum"></div>
   </div>
+  <div class="sns">
+    <a href="https://www.youtube.com/@Asset_gold" target="_blank" rel="noopener">YouTube「マネーキーパー」</a>
+    <a href="https://note.com/moneykeeper/n/neae83f766d3d" target="_blank" rel="noopener">NOTE「金投資虎の巻」</a>
+    <a href="https://x.com/GoldAsset53416" target="_blank" rel="noopener">X</a>
+    <a href="https://yoor.jp/door/moneykeeper" target="_blank" rel="noopener">コミュニティ「ゴルラボ」</a>
+  </div>
   <p class="note">
-    <style>
-  .sns { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 8px; }
-  .sns a {
-    display:inline-block; background:#fff; border:1px solid #e6ddd0;
-    color:#3d3a34; text-decoration:none; border-radius:999px;
-    padding:8px 14px; font-size:13px;
-  }
-  .sns a:hover { background:#f3d7a6; }
-</style>
-<div class="sns">
-  <a href="https://www.youtube.com/@Asset_gold" target="_blank" rel="noopener">YouTube「マネーキーパー」</a>
-  <a href="https://note.com/moneykeeper/n/neae83f766d3d" target="_blank" rel="noopener">NOTE「金投資虎の巻」</a>
-  <a href="https://x.com/GoldAsset53416" target="_blank" rel="noopener">マネーキーパーのX</a>
-  <a href="https://yoor.jp/door/moneykeeper" target="_blank" rel="noopener">マネーキーパーコミュニティ「ゴールドラボ」</a>
-</div>
-
-    各指数の金額を自分の保有に近づける。総額と％は合計から自動計算。
+    スライダーで大まかに、右の数字欄で1万円単位まで合わせる。総額と％は合計から自動計算。
     既存分はホールド、積立だけ毎月の目標％で購入。
     週次は公開情報の月次・局面水準を補間した教育用系列。配当・税金・手数料は含まない。
+    FANG+合成は当時存在した成長株の粗い等ウェイト近似（公式NYSE FANG+ではない）。
   </p>
 </div>
 <script>
@@ -301,10 +303,18 @@ function updateAllocLabels(){
   const w=normAlloc(), t=totalYen();
   document.querySelectorAll('#allocs .alloc-row').forEach(row=>{
     const id=row.dataset.id;
-    row.querySelector('.yen').textContent=fmtMan(holdMan[id]*10000);
     row.querySelector('.pct').textContent=(Math.round(w[id]*1000)/10).toFixed(1)+'%';
   });
   document.getElementById('allocsum').textContent='開始時の合計 '+fmtMan(t)+'（割合は自動）';
+}
+function setHold(id, raw){
+  const v=Math.max(0, Math.min(20000, Math.round(+raw||0)));
+  holdMan[id]=v;
+  const row=document.querySelector('#allocs .alloc-row[data-id="'+id+'"]');
+  if(row){
+    row.querySelector('input[type=range]').value=v;
+    row.querySelector('input.man-in').value=v;
+  }
 }
 function render(){
   weeks=buildWeeks(period);
@@ -347,11 +357,11 @@ function ui(){
     const div=document.createElement('div');
     div.className='alloc-row';
     div.dataset.id=a.id;
-    div.innerHTML=`<label>${a.name}</label><input type="range" min="0" max="20000" step="1" value="${holdMan[a.id]}" data-id="${a.id}"><span class="yen">0</span><span class="pct">0%</span>`;
+    div.innerHTML=`<label>${a.name}</label><input type="range" min="0" max="20000" step="1" value="${holdMan[a.id]}" data-id="${a.id}"><input class="man-in" type="number" min="0" max="20000" step="1" value="${holdMan[a.id]}" data-id="${a.id}"><span class="pct">0%</span>`;
     box.appendChild(div);
   });
   box.querySelectorAll('input').forEach(inp=>{
-    inp.oninput=()=>{ holdMan[inp.dataset.id]=+inp.value; render(); };
+    inp.oninput=()=>{ setHold(inp.dataset.id, inp.value); render(); };
   });
 }
 function stop(){ if(playTimer){ clearInterval(playTimer); playTimer=null; document.getElementById('play').textContent='▶ 再生'; } }
